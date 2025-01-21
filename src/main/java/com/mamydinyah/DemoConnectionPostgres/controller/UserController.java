@@ -36,7 +36,10 @@ public class UserController {
             UserDto userDto = new UserDto();
             userDto.setId(user.getId());
             userDto.setName(user.getName());
+            userDto.setGender(user.getGender());
             userDto.setEmail(user.getEmail());
+            userDto.setPhone(user.getPhone());
+            userDto.setAddress(user.getAddress());
             model.addAttribute("userDto", userDto);
             return "redirect:/";
         }
@@ -49,10 +52,17 @@ public class UserController {
         return "redirect:/";
     }
 
-
     @GetMapping("/delete/{id}")
     public String deleteUser(@PathVariable int id) {
         userService.deleteUser(id);
         return "redirect:/";
+    }
+
+    @GetMapping("/find")
+    public String findByName(@RequestParam String name, Model model) {
+        List<User> users = userService.findByName(name);
+        model.addAttribute("users", users);
+        model.addAttribute("newUser", new UserDto());
+        return "page";
     }
 }

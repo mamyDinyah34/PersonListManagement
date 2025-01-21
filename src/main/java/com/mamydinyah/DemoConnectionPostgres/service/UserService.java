@@ -16,7 +16,10 @@ public class UserService {
     public void saveUser(UserDto userDto) {
         User user = new User();
         user.setName(userDto.getName());
+        user.setGender(userDto.getGender());
         user.setEmail(userDto.getEmail());
+        user.setPhone(userDto.getPhone());
+        user.setAddress(userDto.getAddress());
         userRepository.save(user);
     }
 
@@ -31,12 +34,19 @@ public class UserService {
     public void updateUser(UserDto userDto) {
         userRepository.findById(userDto.getId()).ifPresent(existingUser -> {
             existingUser.setName(userDto.getName());
+            existingUser.setGender(userDto.getGender());
             existingUser.setEmail(userDto.getEmail());
+            existingUser.setPhone(userDto.getPhone());
+            existingUser.setAddress(userDto.getAddress());
             userRepository.save(existingUser);
         });
     }
 
     public void deleteUser(int id) {
         userRepository.deleteById(id);
+    }
+
+    public List<User> findByName(String name) {
+        return userRepository.findByNameContainingIgnoreCase(name);
     }
 }

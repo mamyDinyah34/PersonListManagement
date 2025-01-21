@@ -8,173 +8,259 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-900 text-white py-8">
-<div class="container mx-auto bg-gray-800 p-8 rounded-lg shadow-lg mt-6">
-    <div class="flex justify-between items-center mb-8 border-b pb-6 border-gray-700">
-        <h1 class="text-3xl font-semibold">
-            <i class="fas fa-users mr-2"></i>Person List Management
-        </h1>
-        <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-600" onclick="openModal('createUserModal')">
-            <i class="fas fa-plus-circle mr-2"></i>Add Person
-        </button>
-    </div>
-
-    <div class="overflow-x-auto">
-        <table class="min-w-full table-auto">
-            <thead class="bg-gray-700">
-            <tr>
-                <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
-                    <i class="fas fa-key mr-2"></i>ID
-                </th>
-                <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
-                    <i class="fas fa-user mr-2"></i>Name
-                </th>
-                <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
-                    <i class="fas fa-envelope mr-2"></i>Email
-                </th>
-                <th class="px-6 py-3 text-center text-sm font-medium text-gray-300">
-                    <i class="fas fa-cogs mr-2"></i>Actions
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="user : ${users}" class="bg-gray-800 border-b border-gray-700">
-                <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.id}"></td>
-                <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.name}"></td>
-                <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.email}"></td>
-                <td class="text-center">
-                    <button class="bg-yellow-500 text-white py-1 px-3 rounded-md text-sm mr-2"
-                            th:data-user-id="${user.id}"
-                            th:data-user-name="${user.name}"
-                            th:data-user-email="${user.email}"
-                            onclick="openEditModalFromData(this)"
-                            title="Edit Person">
-                        <i class="fas fa-edit"></i>
+    <div class="container mx-auto bg-gray-800 p-8 rounded-lg shadow-lg mt-6">
+        <div class="flex justify-between items-center mb-8 border-b pb-6 border-gray-700">
+            <h1 class="text-3xl font-semibold">
+                <i class="fas fa-users mr-2"></i>Person List Management
+            </h1>
+            <div class="flex space-x-4">
+                <form th:action="@{/find}" method="get" class="flex" onsubmit="return false;">
+                    <input type="text" name="name" placeholder="Search by name" class="form-input px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" oninput="performSearch(this.value)">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-600 ml-2">
+                        <i class="fas fa-search"></i>
                     </button>
-                    <button class="bg-red-500 text-white py-1 px-3 rounded-md text-sm"
-                            th:data-user-id="${user.id}"
-                            onclick="confirmDeleteFromData(this)"
-                            title="Delete Person">
-                        <i class="fas fa-trash-alt"></i>
+                </form>
+                <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md font-medium hover:bg-blue-600" onclick="openModal('createUserModal')">
+                    <i class="fas fa-plus-circle mr-2"></i>Add Person
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full table-auto">
+                <thead class="bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
+                            <i class="fas fa-key mr-2"></i>ID
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
+                            <i class="fas fa-user mr-2"></i>Name
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
+                            <i class="fas fa-venus-mars mr-2"></i>Gender
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
+                            <i class="fas fa-envelope mr-2"></i>Email
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
+                            <i class="fas fa-phone mr-2"></i>Phone
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-300">
+                            <i class="fas fa-map-marker-alt mr-2"></i>Address
+                        </th>
+                        <th class="px-6 py-3 text-center text-sm font-medium text-gray-300">
+                            <i class="fas fa-cogs mr-2"></i>Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr th:each="user : ${users}" class="bg-gray-800 border-b border-gray-700">
+                        <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.id}"></td>
+                        <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.name}"></td>
+                        <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.gender}"></td>
+                        <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.email}"></td>
+                        <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.phone}"></td>
+                        <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.address}"></td>
+                        <td class="text-center">
+                            <button class="bg-yellow-500 text-white py-1 px-3 rounded-md text-sm mr-2"
+                                th:data-user-id="${user.id}"
+                                th:data-user-name="${user.name}"
+                                th:data-user-gender="${user.gender}"
+                                th:data-user-email="${user.email}"
+                                th:data-user-phone="${user.phone}"
+                                th:data-user-address="${user.address}"
+                                onclick="openEditModalFromData(this)"
+                                title="Edit Person">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="bg-red-500 text-white py-1 px-3 rounded-md text-sm"
+                                th:data-user-id="${user.id}"
+                                onclick="confirmDeleteFromData(this)"
+                                title="Delete Person">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Person Modal -->
+    <div class="modal fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center" id="createUserModal">
+        <div class="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-auto shadow-lg">
+            <div class="flex justify-between items-center mb-3 border-b pb-2 border-gray-700">
+                <h5 class="text-lg font-semibold">
+                    <i class="fas fa-user-plus mr-1"></i>Add New Person
+                </h5>
+                <button type="button" class="text-gray-500 hover:text-gray-300" onclick="closeModal('createUserModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div>
+                <form th:action="@{/create}" method="POST" th:object="${newUser}">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-user mr-1"></i>Name:
+                        </label>
+                        <input type="text" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="name" name="name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="gender" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-venus-mars mr-1"></i>Gender:
+                        </label>
+                        <select class="form-select mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="gender" name="gender" required>
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-envelope mr-1"></i>Email:
+                        </label>
+                        <input type="email" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="email" name="email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="phone" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-phone mr-1"></i>Phone:
+                        </label>
+                        <input type="text" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="phone" name="phone" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="address" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-map-marker-alt mr-1"></i>Address:
+                        </label>
+                        <input type="text" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="address" name="address" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md mt-3 hover:bg-blue-600">
+                        <i class="fas fa-check-circle mr-1"></i>Create Person
                     </button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Create Person Modal -->
-<div class="modal fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center" id="createUserModal">
-    <div class="bg-gray-900 rounded-lg p-8 max-w-lg w-full mx-auto my-auto shadow-lg">
-        <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-700">
-            <h5 class="text-xl font-semibold">
-                <i class="fas fa-user-plus mr-2"></i>Add New Person
-            </h5>
-            <button type="button" class="text-gray-500 hover:text-gray-300" onclick="closeModal('createUserModal')">
-                <i class="fas fa-times"></i>
-            </button>
+                </form>
+            </div>
         </div>
-        <div>
-            <form th:action="@{/create}" method="POST" th:object="${newUser}">
-                <div class="mb-6">
-                    <label for="name" class="block text-sm font-medium text-gray-300">
-                        <i class="fas fa-user mr-2"></i>Name:
-                    </label>
-                    <input type="text" class="form-input mt-2 block w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="name" name="name" required>
-                </div>
-                <div class="mb-6">
-                    <label for="email" class="block text-sm font-medium text-gray-300">
-                        <i class="fas fa-envelope mr-2"></i>Email:
-                    </label>
-                    <input type="email" class="form-input mt-2 block w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="email" name="email" required>
-                </div>
-                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md mt-4 hover:bg-blue-600">
-                    <i class="fas fa-check-circle mr-2"></i>Create Person
+    </div>
+
+    <!-- Edit Person Modal -->
+    <div class="modal fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center" id="editUserModal">
+        <div class="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-auto shadow-lg">
+            <div class="flex justify-between items-center mb-3 border-b pb-2 border-gray-700">
+                <h5 class="text-lg font-semibold">
+                    <i class="fas fa-edit mr-1"></i>Edit Person
+                </h5>
+                <button type="button" class="text-gray-500 hover:text-gray-300" onclick="closeModal('editUserModal')">
+                    <i class="fas fa-times"></i>
                 </button>
-            </form>
+            </div>
+            <div>
+                <form th:action="@{/update}" method="POST">
+                    <input type="hidden" id="editUserId" name="id">
+                    <div class="mb-4">
+                        <label for="editName" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-user mr-1"></i>Name:
+                        </label>
+                        <input type="text" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editName" name="name" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editGender" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-venus-mars mr-1"></i>Gender:
+                        </label>
+                        <select class="form-select mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editGender" name="gender" required>
+                            <option value="" disabled selected>Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editEmail" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-envelope mr-1"></i>Email:
+                        </label>
+                        <input type="email" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editEmail" name="email" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editPhone" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-phone mr-1"></i>Phone:
+                        </label>
+                        <input type="text" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editPhone" name="phone" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="editAddress" class="block text-sm font-medium text-gray-300">
+                            <i class="fas fa-map-marker-alt mr-1"></i>Address:
+                        </label>
+                        <input type="text" class="form-input mt-1 block w-full px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editAddress" name="address" required>
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md mt-3 hover:bg-blue-600">
+                        <i class="fas fa-save mr-1"></i>Save Changes
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Edit Person Modal -->
-<div class="modal fixed inset-0 bg-gray-800 bg-opacity-50 hidden justify-center items-center" id="editUserModal">
-    <div class="bg-gray-900 rounded-lg p-8 max-w-lg w-full mx-auto my-auto shadow-lg">
-        <div class="flex justify-between items-center mb-4 border-b pb-2 border-gray-700">
-            <h5 class="text-xl font-semibold">
-                <i class="fas fa-edit mr-2"></i>Edit Person
-            </h5>
-            <button type="button" class="text-gray-500 hover:text-gray-300" onclick="closeModal('editUserModal')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div>
-            <form th:action="@{/update}" method="POST">
-                <input type="hidden" id="editUserId" name="id">
-                <div class="mb-6">
-                    <label for="editName" class="block text-sm font-medium text-gray-300">
-                        <i class="fas fa-user mr-2"></i>Name:
-                    </label>
-                    <input type="text" class="form-input mt-2 block w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editName" name="name" required>
-                </div>
-                <div class="mb-6">
-                    <label for="editEmail" class="block text-sm font-medium text-gray-300">
-                        <i class="fas fa-envelope mr-2"></i>Email:
-                    </label>
-                    <input type="email" class="form-input mt-2 block w-full px-4 py-2 rounded-lg border border-gray-700 bg-gray-800 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none" id="editEmail" name="email" required>
-                </div>
-                <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md mt-4 hover:bg-blue-600">
-                    <i class="fas fa-save mr-2"></i>Save Changes
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<script>
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    function openEditModalFromData(button) {
-        const userId = button.getAttribute('data-user-id');
-        const userName = button.getAttribute('data-user-name');
-        const userEmail = button.getAttribute('data-user-email');
-
-        document.getElementById('editUserId').value = userId;
-        document.getElementById('editName').value = userName;
-        document.getElementById('editEmail').value = userEmail;
-        openModal('editUserModal');
-    }
-
-    function confirmDeleteFromData(button) {
-        const userId = button.getAttribute('data-user-id');
-        if (confirm('Are you sure you want to delete this person?')) {
-            window.location.href = '/delete/' + userId;
+    <script>
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         }
-    }
 
-    window.onclick = function(event) {
-        if (event.target.classList.contains('modal')) {
-            closeModal(event.target.id);
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
         }
-    }
 
-    document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape') {
-            const openModal = document.querySelector('.modal:not(.hidden)');
-            if (openModal) {
-                closeModal(openModal.id);
+        function openEditModalFromData(button) {
+            const userId = button.getAttribute('data-user-id');
+            const userName = button.getAttribute('data-user-name');
+            const userGender = button.getAttribute('data-user-gender');
+            const userEmail = button.getAttribute('data-user-email');
+            const userPhone = button.getAttribute('data-user-phone');
+            const userAddress = button.getAttribute('data-user-address');
+
+            document.getElementById('editUserId').value = userId;
+            document.getElementById('editName').value = userName;
+            document.getElementById('editGender').value = userGender;
+            document.getElementById('editEmail').value = userEmail;
+            document.getElementById('editPhone').value = userPhone;
+            document.getElementById('editAddress').value = userAddress;
+            openModal('editUserModal');
+        }
+
+        function confirmDeleteFromData(button) {
+            const userId = button.getAttribute('data-user-id');
+            if (confirm('Are you sure you want to delete this person?')) {
+                window.location.href = '/delete/' + userId;
             }
         }
-    });
-</script>
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal(event.target.id);
+            }
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const openModal = document.querySelector('.modal:not(.hidden)');
+                if (openModal) {
+                    closeModal(openModal.id);
+                }
+            }
+        });
+
+        function performSearch(query) {
+            fetch(`/find?name=${query}`)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTableBody = doc.querySelector('#userTableBody').innerHTML;
+                    document.getElementById('userTableBody').innerHTML = newTableBody;
+                });
+        }
+    </script>
 </body>
 </html>
