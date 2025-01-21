@@ -1,0 +1,13 @@
+package com.mamydinyah.DemoConnectionPostgres;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class DemoConnectionPostgresApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(DemoConnectionPostgresApplication.class, args);
+	}
+
+}
